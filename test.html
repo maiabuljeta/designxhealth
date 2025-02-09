@@ -2,25 +2,20 @@
 <html lang="en">
 <head>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-  <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyDqWg8CaszQ8W0cdfdWmy3qmXshZzjaB80",
-    authDomain: "designxhealth-e5762.firebaseapp.com",
-    projectId: "designxhealth-e5762",
-    storageBucket: "designxhealth-e5762.firebasestorage.app",
-    messagingSenderId: "874028198952",
-    appId: "1:874028198952:web:f5e76cd843198835db591d",
-    measurementId: "G-8PJQYE6Z8R"
-  };
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDqWg8CaszQ8W0cdfdWmy3qmXshZzjaB80", // YOUR API KEY HERE
+        authDomain: "designxhealth-e5762.firebaseapp.com", // YOUR AUTH DOMAIN HERE
+        projectId: "designxhealth-e5762", // YOUR PROJECT ID HERE
+        storageBucket: "designxhealth-e5762.firebasestorage.app", // YOUR STORAGE BUCKET HERE
+        messagingSenderId: "874028198952", // YOUR MESSAGING SENDER ID HERE
+        appId: "1:874028198952:web:f5e76cd843198835db591d", // YOUR APP ID HERE
+        measurementId: "G-8PJQYE6Z8R" // YOUR MEASUREMENT ID HERE
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+</script>
 
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
@@ -375,6 +370,13 @@
         function saveData() {
     db.ref('teamData').set(teamData);
 }
+        function loadData() {
+    db.ref('teamData').once('value', snapshot => {
+        const data = snapshot.val();
+        teamData = data || defaultTeamData; // Use default if no data in Firebase
+        refreshTables();
+    }).catch(error => console.error("Error loading data:", error));
+}
 
         // Function to refresh all tables (modified to update from teamData)
         function refreshTables() {
@@ -444,6 +446,7 @@
 
         // Initialize tables (modified to call refreshTables on load)
         document.addEventListener('DOMContentLoaded', () => {
+            loadData(); // Load data from Firebase FIRST!!!
             refreshTables(); // Call refreshTables to populate data from localStorage
             // Make existing cells editable (Corrected! - THIS IS WHERE IT GOES)
             document.querySelectorAll('.directory-table tbody tr').forEach(row => {
@@ -609,17 +612,17 @@
                     input.style.width = '100%';
 
                     input.addEventListener('blur', () => {
-                        e.target.textContent = input.value;
-                        updateTeamData(); // Save on blur
-                    });
+    e.target.textContent = input.value;
+    updateTeamData(true); // Save on blur  <--- THIS IS THE KEY CHANGE
+});
 
-                    input.addEventListener('keypress', (evt) => {
-                        if (evt.key === 'Enter') {
-                            e.target.textContent = input.value;
-                            updateTeamData(); // Save on Enter
-                            input.blur();
-                        }
-                    });
+input.addEventListener('keypress', (evt) => {
+    if (evt.key === 'Enter') {
+        e.target.textContent = input.value;
+        updateTeamData(true); // Save on Enter <--- THIS IS THE KEY CHANGE
+        input.blur();
+    }
+});
 
                     e.target.textContent = '';
                     e.target.appendChild(input);
