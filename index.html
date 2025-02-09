@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Design x Health Directory</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            background-color: #34495e;
+            color: white;
+            padding: 10px 15px;
+            margin: 20px 0 10px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .add-member-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .directory-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .directory-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border: 1px solid #dee2e6;
+            position: sticky;
+            top: 0;
+            background: #f8f9fa;
+        }
+
+        .directory-table td {
+            padding: 12px;
+            border: 1px solid #dee2e6;
+            vertical-align: top;
+        }
+
+        .e-board { background-color: #fff3e0; }
+        .outreach { background-color: #ffebee; }
+        .project-lead { background-color: #e8f5e9; }
+        .organizing { background-color: #e3f2fd; }
+
+        .toggle-btn {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .edit-btn {
+            background: #ffa726;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 5px;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 5px;
+        }
+
+        .toggle-btn:hover, .edit-btn:hover, .delete-btn:hover {
+            opacity: 0.9;
+        }
+
+        .details {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .details.active {
+            display: block;
+        }
+
+        .availability {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .time-slot {
+            background: #e3f2fd;
+            padding: 4px;
+            text-align: center;
+            border-radius: 3px;
+            font-size: 0.85em;
+        }
+
+        .editable:hover {
+            background-color: #f0f0f0;
+            cursor: text;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 500px;
+            max-width: 90%;
+        }
+
+        .modal input, .modal textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .save-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .cancel-btn {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Design x Health Team Directory</h1>
+        <p><strong>INSTRUCTIONS:</strong> 1. Undo doesn’t work once you click outside of a cell. 2. When you click on a cell to edit it, it deletes what was in that cell and replaces it with the new information. 3. The last cell edit you make doesn’t save lol. So if you edits 9 cells, the first 8 will save. So make the last edit an unnecessary one, like an extra period.</p>
+
+
+        <!-- Table template for each section -->
+        <template id="table-template">
+            <table class="directory-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Projects</th>
+                        <th>Hours/Week</th>
+                        <th>Contact</th>
+                        <th>Check-in Frequency</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </template>
+
+        <!-- E-Board Section -->
+        <div class="section-title">
+            <h2>E-Board</h2>
+            <button class="add-member-btn" data-section="e-board">Add Member</button>
+        </div>
+        <div id="e-board-table"></div>
+
+        <!-- Project Lead Section -->
+        <div class="section-title">
+            <h2>Project Lead</h2>
+            <button class="add-member-btn" data-section="project-lead">Add Member</button>
+        </div>
+        <div id="project-lead-table"></div>
+
+        <!-- Organizing Committee Section -->
+        <div class="section-title">
+            <h2>Organizing Committee</h2>
+            <button class="add-member-btn" data-section="organizing">Add Member</button>
+        </div>
+        <div id="organizing-table"></div>
+
+        <!-- Outreach Team Section -->
+        <div class="section-title">
+            <h2>Outreach Team</h2>
+            <button class="add-member-btn" data-section="outreach">Add Member</button>
+        </div>
+        <div id="outreach-table"></div>
+
+        <!-- Core Team Section -->
+        <div class="section-title">
+            <h2>Core Team</h2>
+            <button class="add-member-btn" data-section="core">Add Member</button>
+        </div>
+        <div id="core-table"></div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <h3>Edit Member Details</h3>
+            <form id="editForm">
+                <label for="name">Name:</label>
+                <input type="text" id="name" required>
+
+                <label for="role">Role:</label>
+                <input type="text" id="role" required>
+                
+                <label for="projects">Projects:</label>
+                <input type="text" id="projects" required>
+                
+                <label for="hours">Hours/Week:</label>
+                <input type="text" id="hours" required>
+                
+                <label for="contact">Contact:</label>
+                <input type="email" id="contact" required>
+
+                <label for="checkin">Check-in Frequency:</label>
+                <input type="text" id="checkin" required>
+                
+                <label for="questions">Actions</label>
+                <textarea id="questions" rows="3"></textarea>
+                
+                <label for="availability">Detailed Availability:</label>
+                <textarea id="availability" rows="3"></textarea>
+                
+                <div class="modal-buttons">
+                    <button type="button" class="cancel-btn">Cancel</button>
+                    <button type="submit" class="save-btn">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Initial data structure (modified to include checkin)
+        let teamData = localStorage.getItem('teamData') ? JSON.parse(localStorage.getItem('teamData')) : {
+            'e-board': [
+                {
+                    name: 'Maddie Goldsmith',
+                    role: 'E-Board Member',
+                    projects: 'STEAM kits, CATCH, Finger Contracture, Ming\'s team',
+                    hours: '~10',
+                    contact: 'madelinegoldsmith@brown.edu',
+                    checkin: 'Weekly', // <--- checkin added here
+                    questions: '',
+                    availability: 'Available for team meetings and project coordination'
+                },
+                // Add "checkin" to ALL your initial members in each section, like this:
+                // { name: 'Another Member', role: '...', projects: '...', hours: '...', contact: '...', checkin: 'Monthly', questions: '', availability: '...' },
+            ],
+            'project-lead': [ // Example for another section
+              // Add "checkin" to ALL your initial members in each section, like this:
+              // { name: 'Project Lead 1', role: '...', projects: '...', hours: '...', contact: '...', checkin: 'Bi-weekly', questions: '', availability: '...' },
+            ],
+            'organizing': [/* ... add checkin to initial members */],
+            'outreach': [/* ... add checkin to initial members */],
+            'core': [/* ... add checkin to initial members */]
+        };
+        // Undo/Redo functionality
+        let undoStack = [];
+        let redoStack = [];
+
+        function saveState() {
+            undoStack.push(JSON.stringify(teamData));
+            redoStack = []; // Clear redo stack when new action is performed
+            saveData();
+        }
+
+        function undo() {
+            if (undoStack.length > 0) {
+                redoStack.push(JSON.stringify(teamData));
+                teamData = JSON.parse(undoStack.pop());
+                saveData();
+                refreshTables();
+            }
+        }
+
+        function redo() {
+            if (redoStack.length > 0) {
+                undoStack.push(JSON.stringify(teamData));
+                teamData = JSON.parse(redoStack.pop());
+                saveData();
+                refreshTables();
+            }
+        }
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.metaKey && e.key === 'z') {
+                if (e.shiftKey) {
+                    redo();
+                } else {
+                    undo();
+                }
+                e.preventDefault();
+            }
+        });
+
+        // Function to save data to localStorage
+        function saveData() {
+            localStorage.setItem('teamData', JSON.stringify(teamData));
+        }
+
+        // Function to refresh all tables (modified to update from teamData)
+        function refreshTables() {
+            Object.keys(teamData).forEach(section => {
+                const tableContainer = document.getElementById(`${section}-table`);
+                tableContainer.innerHTML = ''; // Clear existing table
+                const template = document.getElementById('table-template');
+                const tableClone = template.content.cloneNode(true);
+                tableContainer.appendChild(tableClone);
+
+                const tbody = tableContainer.querySelector('tbody');
+                teamData[section].forEach(member => {
+                    tbody.appendChild(createTableRow(member, section));
+                });
+            });
+        }
+        
+       // Update teamData (CORRECTED - THE REAL FIX)
+       function updateTeamData(manualSave = false) {
+            Object.keys(teamData).forEach(section => {
+                const table = document.getElementById(`${section}-table`).querySelector('table');
+                teamData[section] = Array.from(table.rows).slice(1).map(row => {
+                    const detailsParagraph = row.querySelector('.details p');
+                    const memberData = teamData[section][row.rowIndex - 1]; // Get existing data
+
+                    return {
+                        name: row.cells[0].textContent,
+                        role: row.cells[1].textContent,
+                        projects: row.cells[2].textContent,
+                        hours: row.cells[3].textContent,
+                        contact: row.cells[4].textContent,
+                        checkin: row.cells[5].textContent,
+                        questions: row.cells[6].textContent,
+                        availability: detailsParagraph ? detailsParagraph.textContent : '',
+                    };
+                });
+            });
+            if (manualSave) {
+                saveState();
+            }
+        }
+
+        // Function to create table rows (modified to include checkin)
+        function createTableRow(member, section) {
+            const tr = document.createElement('tr');
+            tr.className = section;
+            tr.innerHTML = `
+                <td class="editable">${member.name}</td>
+                <td class="editable">${member.role || ''}</td>
+                <td class="editable">${member.projects}</td>
+                <td class="editable">${member.hours}</td>
+                <td class="editable">${member.contact}</td>
+                <td class="editable">${member.checkin || ''}</td>
+                <td class="editable">${member.questions}</td>
+                <td>
+                    <button class="toggle-btn">View Details</button>
+                    <button class="edit-btn">Edit</button>
+                    <button class="delete-btn">Delete</button>
+                    <div class="details">
+                        <strong>Detailed Availability:</strong>
+                        <p class="editable">${member.availability}</p>
+                    </div>
+                </td>
+            `;
+            return tr;
+        }
+
+        // Initialize tables (modified to call refreshTables on load)
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshTables(); // Call refreshTables to populate data from localStorage
+            // Make existing cells editable (Corrected! - THIS IS WHERE IT GOES)
+            document.querySelectorAll('.directory-table tbody tr').forEach(row => {
+                makeCellsEditable(row); // Call the function for initial rows
+            });
+            
+
+            // ... (rest of the event listeners remain unchanged)
+
+            // Toggle details (Corrected!)
+        document.addEventListener('click', e => {
+            if (e.target.classList.contains('toggle-btn')) {
+                const details = e.target.parentElement.querySelector('.details');
+                details.classList.toggle('active');
+                e.target.textContent = details.classList.contains('active') ? 'Hide Details' : 'View Details';
+
+                // Crucial fix: Blur any focused editable cell *before* toggling details
+                const focusedCell = document.activeElement;
+                if (focusedCell && focusedCell.classList.contains('editable')) {
+                    focusedCell.blur(); // Force blur to trigger save
+                }
+            }
+        });
+
+            // Delete functionality
+            document.addEventListener('click', e => {
+                if (e.target.classList.contains('delete-btn')) {
+                    if (confirm('Are you sure you want to delete this member?')) {
+                        const row = e.target.closest('tr');
+                        const section = Array.from(row.classList)[0];
+                        const rowIndex = row.rowIndex - 1;
+                        teamData[section].splice(rowIndex, 1);
+                        row.remove();
+                        saveState();
+                    }
+                }
+            });
+
+            // Modal functionality
+            const modal = document.getElementById('editModal');
+            const editForm = document.getElementById('editForm');
+            
+            // Edit button handler
+            document.addEventListener('click', e => {
+                if (e.target.classList.contains('edit-btn')) {
+                    const row = e.target.closest('tr');
+                    const cells = row.cells;
+                    
+                    // Populate form
+                    const section = row.classList[0]; // Get the section (e.g., 'e-board')
+                    const rowIndex = row.rowIndex - 1; // Get the row index (0-based)
+                    const memberData = teamData[section][rowIndex]; // Access correct member data
+
+                    document.getElementById('name').value = memberData.name;
+                    document.getElementById('role').value = memberData.role;
+                    document.getElementById('projects').value = memberData.projects;
+                    document.getElementById('hours').value = memberData.hours;
+                    document.getElementById('contact').value = memberData.contact;
+                    document.getElementById('checkin').value = memberData.checkin;
+                    document.getElementById('questions').value = memberData.questions;
+                    document.getElementById('availability').value = memberData.availability;
+                    
+                    modal.classList.add('active');
+                    // *** THIS IS THE CRUCIAL MISSING LINE ***
+                    editForm.dataset.editingSection = section; // Store the section!
+                    editForm.dataset.editingRow = rowIndex;   // Store the row index
+                }
+            });
+
+            // Close modal on cancel
+            document.querySelector('.cancel-btn').addEventListener('click', () => {
+                modal.classList.remove('active');
+            });
+
+            editForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const section = e.target.dataset.editingSection; // Get the section
+    const rowIndex = parseInt(e.target.dataset.editingRow); // Parse to integer
+
+    teamData[section][rowIndex] = { // Update the correct member in teamData
+        name: document.getElementById('name').value,
+        role: document.getElementById('role').value,
+        projects: document.getElementById('projects').value,
+        hours: document.getElementById('hours').value,
+        contact: document.getElementById('contact').value,
+        checkin: document.getElementById('checkin').value,
+        questions: document.getElementById('questions').value,
+        availability: document.getElementById('availability').value
+    };
+    refreshTables(); // Refresh the table
+
+    modal.classList.remove('active');
+    saveState();
+});
+
+   // Add new member (CORRECTED to update teamData immediately)
+   document.querySelectorAll('.add-member-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const section = btn.dataset.section;
+                const tbody = document.querySelector(`#${section}-table tbody`);
+
+                const newMember = {
+                    name: 'New Member',
+                    role: 'TBD',
+                    projects: 'TBD',
+                    hours: 'TBD',
+                    contact: '',
+                    checkin: 'TBD',
+                    questions: '',
+                    availability: 'Schedule to be determined'
+                };
+
+                const newRow = createTableRow(newMember, section);
+                tbody.appendChild(newRow);
+
+                teamData[section].push(newMember); // Update teamData *first*
+                saveState(); // Then save state
+
+                // Make the new cells editable (Important!)
+                makeCellsEditable(newRow); // Call the new function
+                
+            });
+        });
+
+        // Function to make cells editable (NEW FUNCTION - Corrected!)
+        function makeCellsEditable(row) {
+    const editableCells = row.querySelectorAll('.editable');
+    editableCells.forEach(cell => {
+        cell.addEventListener('click', function(e) {
+            if (e.target.classList.contains('editable')) {
+                const originalContent = e.target.textContent;
+                const input = document.createElement('input');
+                input.value = originalContent;
+                input.style.width = '100%';
+
+                input.addEventListener('blur', () => {
+                    e.target.textContent = input.value;
+                    requestAnimationFrame(() => { updateTeamData(true); }); // Use requestAnimationFrame
+                });
+
+                input.addEventListener('keypress', (evt) => {
+                    if (evt.key === 'Enter') {
+                        e.target.textContent = input.value;
+                        requestAnimationFrame(() => { updateTeamData(true); }); // Use requestAnimationFrame
+                        input.blur();
+                    }
+                });
+
+                e.target.textContent = '';
+                e.target.appendChild(input);
+                input.focus();
+            }
+        });
+    });
+}
+
+            // Make cells editable inline (modified to save on blur/Enter)
+            document.addEventListener('click', e => {
+                if (e.target.classList.contains('editable')) {
+                    const originalContent = e.target.textContent;
+                    const input = document.createElement('input');
+                    input.value = originalContent;
+                    input.style.width = '100%';
+
+                    input.addEventListener('blur', () => {
+                        e.target.textContent = input.value;
+                        updateTeamData(); // Save on blur
+                    });
+
+                    input.addEventListener('keypress', (evt) => {
+                        if (evt.key === 'Enter') {
+                            e.target.textContent = input.value;
+                            updateTeamData(); // Save on Enter
+                            input.blur();
+                        }
+                    });
+
+                    e.target.textContent = '';
+                    e.target.appendChild(input);
+                    input.focus();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
