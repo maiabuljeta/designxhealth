@@ -299,32 +299,11 @@
             </form>
         </div>
     </div>
-
+<script src="data.js"></script>
     <script>
         // Initial data structure (modified to include checkin)
-        let teamData = localStorage.getItem('teamData') ? JSON.parse(localStorage.getItem('teamData')) : {
-            'e-board': [
-                {
-                    name: 'Maddie Goldsmith',
-                    role: 'E-Board Member',
-                    projects: 'STEAM kits, CATCH, Finger Contracture, Ming\'s team',
-                    hours: '~10',
-                    contact: 'madelinegoldsmith@brown.edu',
-                    checkin: 'Weekly', // <--- checkin added here
-                    questions: '',
-                    availability: 'Available for team meetings and project coordination'
-                },
-                // Add "checkin" to ALL your initial members in each section, like this:
-                // { name: 'Another Member', role: '...', projects: '...', hours: '...', contact: '...', checkin: 'Monthly', questions: '', availability: '...' },
-            ],
-            'project-lead': [ // Example for another section
-              // Add "checkin" to ALL your initial members in each section, like this:
-              // { name: 'Project Lead 1', role: '...', projects: '...', hours: '...', contact: '...', checkin: 'Bi-weekly', questions: '', availability: '...' },
-            ],
-            'organizing': [/* ... add checkin to initial members */],
-            'outreach': [/* ... add checkin to initial members */],
-            'core': [/* ... add checkin to initial members */]
-        };
+        let teamData = defaultTeamData;
+        
         // Undo/Redo functionality
         let undoStack = [];
         let redoStack = [];
