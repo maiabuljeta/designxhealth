@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <meta charset="UTF-8">
     <title>Design x Health Directory</title>
     <style>
@@ -344,10 +346,10 @@
             }
         });
 
-        // Function to save data to localStorage
+        // Function to save data to Firebase
         function saveData() {
-            localStorage.setItem('teamData', JSON.stringify(teamData));
-        }
+    db.ref('teamData').set(teamData);
+}
 
         // Function to refresh all tables (modified to update from teamData)
         function refreshTables() {
