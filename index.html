@@ -206,33 +206,6 @@
 </head>
 <body>
     <div class="container">
-        
-    <!-- Add the Firebase configuration code right here, before the rest of the content -->
-    <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDqWg8CaszQ8W0cdfdWmy3qmXshZzjaB80",
-            authDomain: "designxhealth-e5762.firebaseapp.com",
-            databaseURL: "https://designxhealth-e5762.firebaseio.com",
-            projectId: "designxhealth-e5762",
-            storageBucket: "designxhealth-e5762.firebasestorage.app",
-            messagingSenderId: "874028198952",
-            appId: "1:874028198952:web:f5e76cd843198835db591d"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        // Load initial data
-        let teamData = defaultTeamData;
-        db.ref('teamData').once('value').then((snapshot) => {
-            if (snapshot.val()) {
-                teamData = snapshot.val();
-                refreshTables();
-            }
-        });
-    </script>
         <h1>Design x Health Team Directory</h1>
         <p><strong>INSTRUCTIONS:</strong> 1. Undo doesn’t work once you click outside of a cell. 2. When you click on a cell to edit it, it deletes what was in that cell and replaces it with the new information. 3. The last cell edit you make doesn’t save lol. So if you edits 9 cells, the first 8 will save. So make the last edit an unnecessary one, like an extra period.</p>
 
